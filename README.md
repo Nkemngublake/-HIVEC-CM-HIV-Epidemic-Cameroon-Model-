@@ -236,6 +236,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions, issues, or collaborations:
 
+Nkemngu Blake A. (nkemngublake@gmail.com)
 - Open an issue on GitHub
 - Contact the development team
 - Review the documentation in the `docs/` directory
@@ -244,7 +245,6 @@ For questions, issues, or collaborations:
 
 - **World Bank** for providing comprehensive demographic and health data
 - **UNAIDS** for HIV/AIDS statistics and program data
-- **Cameroon Ministry of Health** for epidemiological insights
 - **Research Community** for epidemiological modeling best practices
 
 ---
@@ -298,12 +298,3 @@ python scripts/time_series_analysis.py
 1. **Data Download**: Run `data_processing.py` to fetch latest data
 2. **Data Preparation**: Run `data_wrangling.py` to clean and merge datasets
 3. **Analysis**: Run analysis scripts or use Jupyter notebooks for exploration
-
-## Analysis Findings
-[Add your key findings here]
-
-## Contributing
-[Add contribution guidelines]
-
-## License
-[Add license information]
