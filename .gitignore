@@ -1,0 +1,170 @@
+# HIVEC-CM: HIV Epidemic Cameroon Model - .gitignore
+# =====================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# HIVEC-CM Specific Files
+# ========================
+
+# Large simulation outputs (keep examples but exclude bulk results)
+Simulation_results_scenarios/*.csv
+Simulation_results_scenarios/*.png
+figures/*.png
+figures/*.jpg
+figures/*.pdf
+results/*.csv
+results/*.png
+model_outputs/
+
+# Timestamped analysis files
+Quick_Preview_*.png
+Enhanced_Parameters_Test_*.png
+CORRECTED_*.csv
+CORRECTED_*.png
+EXTENDED_*.csv
+EXTENDED_*.png
+*_20250805_*.csv
+*_20250805_*.png
+
+# Temporary files
+tmp/
+temp/
+cache/
+.cache/
+test_results/
+
+# Log files
+*.log
+logs/
+
+# Large data files (keep sample data but exclude bulk datasets)
+data/raw/*.zip
+data/raw/*.csv
+data/processed/large_*.csv
+data/cache/
+
+# IDE and OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Personal configuration
+config/personal_*.json
+config/local_*.py
+
+# Backup files
+*.bak
+*.backup
+
+# Keep these important files
+!README.md
+!LICENSE
+!requirements.txt
+!examples/
+!data/sample/
+!figures/example_*.png
