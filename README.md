@@ -6,7 +6,7 @@
 
 ## Overview
 
-**HIVEC-CM** (HIV Epidemic Cameroon Model) is a sophisticated agent-based mathematical model for simulating HIV/AIDS epidemic dynamics in Cameroon from 1990-2100. The model incorporates evidence-based parameters, time-varying interventions, and policy scenarios to support public health decision-making and research.
+**HIVEC-CM** (HIV Epidemic Cameroon Model) is a sophisticated agent-based mathematical model, developed by Nkemngu Blake, for simulating HIV/AIDS epidemic dynamics in Cameroon from 1990-2100. The model incorporates evidence-based parameters, time-varying interventions, and policy scenarios to support public health decision-making and research.
 
 ## ✨ Key Features
 
@@ -250,25 +250,6 @@ Nkemngu Blake A. (nkemngublake@gmail.com)
 ---
 
 *This model is designed for research and educational purposes. Results should be interpreted by qualified epidemiologists and public health professionals.*
-
-## Project Structure
-```
-├── data/                       # Raw and processed datasets
-│   ├── raw/                   # Original downloaded data
-│   ├── processed/             # Cleaned and merged datasets
-│   └── external/              # External data sources
-├── scripts/                   # Analysis and processing scripts
-│   ├── data_processing.py     # Data download utilities
-│   ├── data_wrangling.py      # Data cleaning and merging
-│   ├── time_series_analysis.py # Time series visualization
-│   └── statistical_analysis.py # Statistical analysis
-├── figures/                   # Generated visualizations
-├── reports/                   # Analysis reports and findings
-├── notebooks/                 # Jupyter notebooks for exploration
-├── config/                    # Configuration files
-└── tests/                     # Unit tests
-
-```
 
 ## Data Sources
 - **World Bank**: Population data and HIV prevalence rates for Cameroon
