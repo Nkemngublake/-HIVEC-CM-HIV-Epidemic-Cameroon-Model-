@@ -108,8 +108,7 @@ Simulation_results_scenarios/*.png
 figures/*.png
 figures/*.jpg
 figures/*.pdf
-results/*.csv
-results/*.png
+results/**
 model_outputs/
 
 # Timestamped analysis files
@@ -160,6 +159,12 @@ config/local_*.py
 # Backup files
 *.bak
 *.backup
+
+# LaTeX build artifacts
+manuscripts/*.aux
+manuscripts/*.fdb_latexmk
+manuscripts/*.fls
+manuscripts/*.synctex.gz
 
 # Keep these important files
 !README.md

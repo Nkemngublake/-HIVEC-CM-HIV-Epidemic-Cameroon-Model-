@@ -32,6 +32,7 @@ class ModelCalibrator:
         self.model_class = model_class
         self.calibration_years = None
         self.target_prevalences = None
+        self._real_prev_col = None
         self._prepare_calibration_data()
         
     def _prepare_calibration_data(self):
@@ -41,14 +42,21 @@ class ModelCalibrator:
         
         self.calibration_years = []
         self.target_prevalences = []
-        
+        # Determine available prevalence column (percent vs. proportion)
+        for col in ['HIV Prevalence', 'HIV_Prevalence_Rate']:
+            if col in self.target_data.columns:
+                self._real_prev_col = col
+                break
+        if self._real_prev_col is None:
+            raise ValueError("Target data must contain 'HIV Prevalence' or 'HIV_Prevalence_Rate'")
+
         for year in target_years:
             if year in self.target_data['Year'].values:
-                prevalence = self.target_data[
-                    self.target_data['Year'] == year]['HIV Prevalence'].iloc[0]
+                prevalence = self.target_data[self.target_data['Year'] == year][self._real_prev_col].iloc[0]
                 if not pd.isna(prevalence):
                     self.calibration_years.append(year)
-                    self.target_prevalences.append(prevalence)
+                    # Convert to proportion if data appears to be in percent
+                    self.target_prevalences.append(float(prevalence) / 100.0 if prevalence > 1 else float(prevalence))
         
         logger.info(f"Prepared {len(self.calibration_years)} calibration points")
     
@@ -116,29 +124,32 @@ class ModelCalibrator:
         penalty = 0.0
         
         # Penalty for extremely high prevalence
-        max_prevalence = results['hiv_prevalence'].max()
-        if max_prevalence > 15:  # More than 15% seems too high for Cameroon
-            penalty += (max_prevalence - 15) * 10
+        max_prevalence = results['hiv_prevalence'].max()  # proportion
+        if max_prevalence > 0.15:  # >15% seems too high for Cameroon
+            penalty += (max_prevalence - 0.15) * 100.0
         
         # Penalty for prevalence increasing after 2010
         recent_trend = results[results['year'] >= 2010]['hiv_prevalence']
         if len(recent_trend) > 5:
             trend_slope = np.polyfit(range(len(recent_trend)), recent_trend, 1)[0]
-            if trend_slope > 0.1:  # Should be declining
-                penalty += trend_slope * 50
+            # slope is in proportion per step (~per year when dt=1)
+            if trend_slope > 0.001:  # >0.1 percentage points increasing
+                penalty += trend_slope * 500.0
         
         # Penalty for unrealistic ART coverage
-        final_art_coverage = results['art_coverage'].iloc[-1]
-        if final_art_coverage > 90:  # Unrealistically high
-            penalty += (final_art_coverage - 90) * 2
+        final_art_coverage = results['art_coverage'].iloc[-1]  # proportion
+        if final_art_coverage > 0.90:  # Unrealistically high
+            penalty += (final_art_coverage - 0.90) * 100.0
         
         return penalty
     
     def _array_to_params(self, params_array: np.ndarray):
-        """Convert parameter array to ModelParameters object."""
-        from .hiv_model import ModelParameters
-        
-        params = ModelParameters()
+        """Convert parameter array to ModelParameters object.
+
+        Starts from baseline parameters loaded from JSON; then overrides entries.
+        """
+        from hivec_cm.models.parameters import load_parameters
+        params = load_parameters('config/parameters.json')
         
         # Map array elements to parameters (order matters!)
         params.base_transmission_rate = params_array[0]
@@ -392,13 +403,14 @@ class MultiObjectiveCalibrator(ModelCalibrator):
         if len(prevalences) > 10:
             differences = np.diff(prevalences)
             volatility = np.std(differences)
-            if volatility > 2.0:  # Too volatile
-                penalty += (volatility - 2.0) * 5
+            # differences in proportion units; threshold ~2 percentage points
+            if volatility > 0.02:
+                penalty += (volatility - 0.02) * 250.0
         
         # Realistic peak timing and magnitude
         peak_prevalence = np.max(prevalences)
-        if peak_prevalence > 12:  # Too high for Cameroon
-            penalty += (peak_prevalence - 12) * 2
+        if peak_prevalence > 0.12:  # >12% too high for Cameroon
+            penalty += (peak_prevalence - 0.12) * 100.0
         
         return penalty
 
@@ -424,9 +436,9 @@ def run_comprehensive_calibration(target_data: pd.DataFrame,
     if calibration_method == 'differential_evolution':
         best_params, best_objective = calibrator.calibrate_differential_evolution()
     else:
-        # Use default parameters as starting point
-        from .hiv_model import ModelParameters
-        initial_params = ModelParameters()
+        # Use default parameters from JSON as starting point
+        from hivec_cm.models.parameters import load_parameters
+        initial_params = load_parameters('config/parameters.json')
         best_params, best_objective = calibrator.calibrate_nelder_mead(initial_params)
     
     # Validate calibrated parameters

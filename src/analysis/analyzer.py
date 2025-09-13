@@ -201,12 +201,22 @@ class ModelAnalyzer:
         
         # Find overlapping years
         common_years = set(self.results['year']) & set(self.real_data['Year'])
-        
+
+        # Determine real prevalence column (assumed in percent)
+        real_prev_col = None
+        for col in ['HIV Prevalence', 'HIV_Prevalence_Rate']:
+            if col in self.real_data.columns:
+                real_prev_col = col
+                break
+        if real_prev_col is None:
+            return None
+
         validation_data = []
         for year in sorted(common_years):
-            real_prev = self.real_data[self.real_data['Year'] == year]['HIV Prevalence'].iloc[0]
-            model_prev = self.results[self.results['year'] == year]['hiv_prevalence'].iloc[0]
-            
+            real_prev = self.real_data[self.real_data['Year'] == year][real_prev_col].iloc[0]
+            model_prev_prop = self.results[self.results['year'] == year]['hiv_prevalence'].iloc[0]
+            model_prev = model_prev_prop * 100.0  # convert to percent for comparison
+
             if not pd.isna(real_prev):
                 validation_data.append({
                     'year': year,
@@ -311,13 +321,34 @@ class ModelAnalyzer:
     
     def _plot_prevalence_trends(self, ax):
         """Plot HIV prevalence trends with real data comparison."""
-        ax.plot(self.results['year'], self.results['hiv_prevalence'], 
-                'b-', linewidth=3, label='Model', alpha=0.8)
-        
+        # Model prevalence stored as proportion; plot in %
+        ax.plot(
+            self.results['year'],
+            self.results['hiv_prevalence'] * 100.0,
+            'b-',
+            linewidth=3,
+            label='Model',
+            alpha=0.8,
+        )
+
         if self.real_data is not None:
-            mask = self.real_data['HIV Prevalence'].notna()
-            ax.plot(self.real_data[mask]['Year'], self.real_data[mask]['HIV Prevalence'], 
-                    'ro-', linewidth=2, markersize=6, label='Real Data', alpha=0.7)
+            # Support multiple column names for real prevalence
+            real_prev_col = None
+            for col in ['HIV Prevalence', 'HIV_Prevalence_Rate']:
+                if col in self.real_data.columns:
+                    real_prev_col = col
+                    break
+            if real_prev_col is not None:
+                mask = self.real_data[real_prev_col].notna()
+                ax.plot(
+                    self.real_data[mask]['Year'],
+                    self.real_data[mask][real_prev_col],
+                    'ro-',
+                    linewidth=2,
+                    markersize=6,
+                    label='Real Data',
+                    alpha=0.7,
+                )
         
         ax.set_xlabel('Year', fontsize=12)
         ax.set_ylabel('HIV Prevalence (%)', fontsize=12)
@@ -420,7 +451,8 @@ class ModelAnalyzer:
     
     def _plot_epidemic_phases(self, ax):
         """Plot epidemic phases (growth, peak, decline)."""
-        prevalence = self.results['hiv_prevalence']
+        # Convert prevalence to percent for visualization
+        prevalence = self.results['hiv_prevalence'] * 100.0
         years = self.results['year']
         
         # Find peak
@@ -488,13 +520,15 @@ class ModelAnalyzer:
         years = self.results['year']
         
         # Show multiple indicators
-        ax.plot(years, self.results['hiv_prevalence'], 'red', linewidth=3, 
-               label='HIV Prevalence')
+        # Prevalence as percent for display
+        ax.plot(years, self.results['hiv_prevalence'] * 100.0, 'red', linewidth=3, 
+               label='HIV Prevalence (%)')
         
         # Normalize ART coverage to same scale
-        art_coverage_norm = self.results['art_coverage'] / 10  # Scale for visibility
+        # Convert coverage to percent then scale for visibility
+        art_coverage_norm = (self.results['art_coverage'] * 100.0) / 10
         ax.plot(years, art_coverage_norm, 'green', linewidth=2, 
-               label='ART Coverage (÷10)')
+               label='ART Coverage (%, ÷10)')
         
         # Show intervention milestones
         ax.axvline(x=2005, color='blue', linestyle='--', alpha=0.7, 
@@ -518,16 +552,16 @@ class ModelAnalyzer:
             
             stats_text = f"""
 KEY EPIDEMIC INDICATORS:
-• Peak Prevalence: {indicators['peak_prevalence']:.1f}% (Year: {indicators['peak_year']:.0f})
-• Final Prevalence: {indicators['final_prevalence']:.1f}%
-• Prevalence Decline: {indicators['prevalence_decline']:.1f} percentage points
-• Final ART Coverage: {indicators['final_art_coverage']:.1f}%
+• Peak Prevalence: {indicators['peak_prevalence'] * 100:.1f}% (Year: {indicators['peak_year']:.0f})
+• Final Prevalence: {indicators['final_prevalence'] * 100:.1f}%
+• Prevalence Decline: {indicators['prevalence_decline'] * 100:.1f} percentage points
+• Final ART Coverage: {indicators['final_art_coverage'] * 100:.1f}%
 • Total HIV Infections: {indicators['total_infections']:,}
 • Estimated Deaths: {indicators['cumulative_deaths']:,}
 
 TRANSMISSION DYNAMICS:
 • Peak Incidence Rate: {indicators['max_incidence_rate']:.2f} per 1000
-• ART Scale-up Rate: {indicators['art_scale_up_rate']:.1f}% per year
+• ART Scale-up Rate: {indicators['art_scale_up_rate'] * 100:.1f}% per year
 """
             
             if 'validation' in self.analysis_results:
@@ -580,8 +614,12 @@ MODEL VALIDATION:
         # Treatment and Care
         report_lines.append("TREATMENT AND CARE:")
         report_lines.append("-" * 20)
-        report_lines.append(f"Final ART Coverage: {epidemic_indicators['final_art_coverage']:.1f}%")
-        report_lines.append(f"ART Scale-up Rate: {epidemic_indicators['art_scale_up_rate']:.1f}% per year")
+        report_lines.append(
+            f"Final ART Coverage: {epidemic_indicators['final_art_coverage'] * 100:.1f}%"
+        )
+        report_lines.append(
+            f"ART Scale-up Rate: {epidemic_indicators['art_scale_up_rate'] * 100:.1f}% per year"
+        )
         
         cascade = intervention_impact['cascade_proportions']
         report_lines.append(f"Testing Rate: {cascade['testing_rate']*100:.1f}%")

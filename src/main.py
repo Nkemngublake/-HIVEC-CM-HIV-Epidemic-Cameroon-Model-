@@ -1,8 +1,8 @@
 """
-Main Entry Point for HIV/AIDS Epidemiological Model
-==================================================
+Main Entry Point for HIVEC-CM
+=============================
 
-Command-line interface and orchestration for the HIV/AIDS epidemic model
+Command-line interface and orchestration for the HIVEC-CM (HIV Epidemic Cameroon Model)
 with configuration management and comprehensive analysis pipeline.
 """
 
@@ -17,11 +17,11 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from models.hiv_model import EnhancedHIVModel, ModelParameters
+from hivec_cm.models.model import EnhancedHIVModel
+from hivec_cm.models.parameters import load_parameters, ModelParameters
 from models.calibrator import run_comprehensive_calibration
 from analysis.analyzer import ModelAnalyzer, save_analysis_results
 from utils.data_loader import load_cameroon_data, validate_data
-from utils.config_manager import ConfigManager
 
 
 def setup_logging(log_level: str = "INFO", log_file: str = None):
@@ -61,8 +61,8 @@ Examples:
     )
     
     # Basic simulation parameters
-    parser.add_argument('--config', type=str, default='config/default.yaml',
-                       help='Configuration file path')
+    parser.add_argument('--config', type=str, default='config/parameters.json',
+                       help='Parameter configuration file path (JSON)')
     parser.add_argument('--years', type=int, default=35,
                        help='Simulation duration in years')
     parser.add_argument('--population', type=int, default=75000,
@@ -105,24 +105,23 @@ Examples:
 
 
 def load_configuration(config_path: str, args: argparse.Namespace) -> dict:
-    """Load and merge configuration from file and command line."""
-    config_manager = ConfigManager()
-    
-    if os.path.exists(config_path):
-        config = config_manager.load_config(config_path)
-    else:
-        logging.warning(f"Config file {config_path} not found, using defaults")
-        config = config_manager.get_default_config()
-    
-    # Override with command line arguments
-    if args.years != 35:
-        config['simulation']['years'] = args.years
-    if args.population != 75000:
-        config['model']['initial_population'] = args.population
-    if args.dt != 0.1:
-        config['simulation']['dt'] = args.dt
-    
-    return config
+    """Build a simple runtime configuration from CLI options.
+
+    Parameters themselves are loaded via JSON using `load_parameters`.
+    """
+    return {
+        'simulation': {
+            'years': args.years,
+            'dt': args.dt,
+        },
+        'calibration': {
+            'method': args.calibration_method,
+        },
+        'io': {
+            'config_path': config_path,
+            'output': args.output,
+        },
+    }
 
 
 def run_calibration(config: dict, data_file: str = None) -> ModelParameters:
@@ -156,7 +155,7 @@ def run_calibration(config: dict, data_file: str = None) -> ModelParameters:
     return best_params, calibration_results
 
 
-def run_simulation(params: ModelParameters, config: dict) -> tuple:
+def run_simulation(params: ModelParameters, config: dict, *, start_year: int = 1990) -> tuple:
     """Run the main HIV epidemic simulation."""
     logging.info("Starting epidemic simulation...")
     
@@ -168,7 +167,7 @@ def run_simulation(params: ModelParameters, config: dict) -> tuple:
         logging.warning("No validation data available")
     
     # Initialize and run model
-    model = EnhancedHIVModel(params, validation_data)
+    model = EnhancedHIVModel(params, validation_data, start_year=start_year)
     
     simulation_config = config.get('simulation', {})
     results = model.run_simulation(
@@ -210,10 +209,10 @@ def print_summary(epidemic_indicators: dict, validation_metrics: dict = None):
     print("HIV/AIDS EPIDEMIC MODEL - SIMULATION SUMMARY")
     print("="*60)
     
-    print(f"Peak HIV Prevalence: {epidemic_indicators['peak_prevalence']:.2f}% "
+    print(f"Peak HIV Prevalence: {epidemic_indicators['peak_prevalence'] * 100:.2f}% "
           f"(Year: {epidemic_indicators['peak_year']:.0f})")
-    print(f"Final HIV Prevalence: {epidemic_indicators['final_prevalence']:.2f}%")
-    print(f"Final ART Coverage: {epidemic_indicators['final_art_coverage']:.1f}%")
+    print(f"Final HIV Prevalence: {epidemic_indicators['final_prevalence'] * 100:.2f}%")
+    print(f"Final ART Coverage: {epidemic_indicators['final_art_coverage'] * 100:.1f}%")
     print(f"Total HIV Infections: {epidemic_indicators['total_infections']:,}")
     print(f"Estimated Deaths: {epidemic_indicators['cumulative_deaths']:,}")
     
@@ -227,7 +226,8 @@ def print_summary(epidemic_indicators: dict, validation_metrics: dict = None):
 
 
 def save_run_metadata(config: dict, output_dir: str, 
-                     calibration_results: dict = None):
+                     calibration_results: dict = None,
+                     params: ModelParameters = None):
     """Save run metadata and configuration."""
     metadata = {
         'run_info': {
@@ -235,7 +235,7 @@ def save_run_metadata(config: dict, output_dir: str,
             'model_version': '3.0',
             'description': 'Enhanced HIV/AIDS Epidemiological Model for Cameroon'
         },
-        'configuration': config
+        'configuration': config,
     }
     
     if calibration_results:
@@ -244,6 +244,12 @@ def save_run_metadata(config: dict, output_dir: str,
             'objective_value': calibration_results['objective_value'],
             'validation_metrics': calibration_results['validation_metrics']
         }
+    if params is not None:
+        try:
+            from dataclasses import asdict
+            metadata['parameters'] = asdict(params)
+        except Exception:
+            pass
     
     metadata_path = os.path.join(output_dir, 'run_metadata.json')
     with open(metadata_path, 'w') as f:
@@ -264,9 +270,19 @@ def main():
     logging.info(f"Command line arguments: {vars(args)}")
     
     try:
-        # Load configuration
+        # Load configuration and parameters
         config = load_configuration(args.config, args)
-        
+        if not os.path.exists(args.config):
+            raise FileNotFoundError(f"Config file not found: {args.config}")
+        params = load_parameters(args.config)
+        # Allow CLI to override initial population from config
+        if args.population is not None:
+            try:
+                params.initial_population = int(args.population)
+                logging.info(f"Overriding initial population to {params.initial_population}")
+            except Exception:
+                logging.warning("Failed to apply population override; using config value")
+
         # Create output directory
         os.makedirs(args.output, exist_ok=True)
         
@@ -280,14 +296,15 @@ def main():
         # Run calibration if requested
         if args.calibrate or args.calibrate_only:
             best_params, calibration_results = run_calibration(config, args.data_file)
+            # Apply population override to calibrated params as well
+            if args.population is not None:
+                try:
+                    best_params.initial_population = int(args.population)
+                except Exception:
+                    pass
         else:
-            # Use default parameters
-            best_params = ModelParameters()
-            # Apply configuration overrides
-            model_config = config.get('model', {})
-            for param, value in model_config.items():
-                if hasattr(best_params, param):
-                    setattr(best_params, param, value)
+            # Use parameters from JSON (possibly overridden above)
+            best_params = params
         
         # Exit early if calibration-only
         if args.calibrate_only:
@@ -295,7 +312,7 @@ def main():
             return
         
         # Run main simulation
-        results, validation_data = run_simulation(best_params, config)
+        results, validation_data = run_simulation(best_params, config, start_year=1990)
         
         # Save raw results
         results_path = os.path.join(args.output, 'simulation_results.csv')
@@ -313,7 +330,7 @@ def main():
             logging.info(f"Configuration saved to {config_path}")
         
         # Save run metadata
-        save_run_metadata(config, args.output, calibration_results)
+        save_run_metadata(config, args.output, calibration_results, params=best_params)
         
         logging.info(f"All outputs saved to {args.output}")
         print(f"\n✓ Model run completed successfully!")

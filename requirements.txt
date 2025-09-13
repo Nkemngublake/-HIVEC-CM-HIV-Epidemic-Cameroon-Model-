@@ -1,34 +1,37 @@
 # HIV/AIDS Epidemiological Model for Cameroon
-# Core data analysis packages
-pandas>=1.5.0
-numpy>=1.21.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
-scipy>=1.7.0
+#
+# This file contains the pinned dependencies for the project to ensure reproducibility.
+# Use 'pip install -r requirements.txt' to install.
 
-# Configuration and serialization
-PyYAML>=6.0
+# --- Core Data Analysis ---
+pandas==2.2.2
+numpy==1.26.4
+matplotlib==3.9.2
+seaborn==0.13.2
+scipy==1.13.1
+statsmodels==0.14.2
+scikit-learn==1.5.1
+numba==0.59.1
 
-# Data download and API access
-requests>=2.28.0
+# --- Configuration ---
+PyYAML==6.0.1
 
-# Statistical analysis
-scipy>=1.9.0
-statsmodels>=0.13.0
-scikit-learn>=1.1.0
+# --- Optional: Jupyter Environment ---
+jupyter==1.0.0
+ipykernel==6.29.4
 
-# Jupyter notebooks (optional)
-jupyter>=1.0.0
-ipykernel>=6.0.0
+# --- Optional: Visualization ---
+plotly==5.22.0
+bokeh==3.4.1
+streamlit==1.36.0
+dash==2.17.1
+fastapi==0.112.0
+uvicorn[standard]==0.30.0
 
-# Data visualization enhancements
-plotly>=5.0.0
-bokeh>=2.4.0
+# --- Development & Testing ---
+pytest==8.2.2
+black==24.4.2
+flake8==7.1.0
 
-# Development and testing
-pytest>=7.0.0
-black>=22.0.0
-flake8>=4.0.0
-
-# Documentation
-sphinx>=4.0.0
+# --- Documentation ---
+sphinx==7.4.7

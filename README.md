@@ -48,22 +48,22 @@
 
 1. **Run a simple simulation**:
    ```bash
-   python run_model.py --years 20 --output results
+   python -m src.main --years 20 --output results --config config/parameters.json
    ```
 
 2. **Run with calibration**:
    ```bash
-   python run_model.py --calibrate --years 30 --output calibrated_results
+   python -m src.main --calibrate --years 30 --output calibrated_results --config config/parameters.json
    ```
 
-3. **Use custom configuration**:
+3. **Use custom parameters (JSON)**:
    ```bash
-   python run_model.py --config config/custom.yaml --output custom_results
+   python -m src.main --config config/parameters.json --output custom_results
    ```
 
 4. **Validate input data**:
    ```bash
-   python run_model.py --validate-data --years 25
+   python -m src.main --validate-data --years 25 --config config/parameters.json
    ```
 
 ## 📊 Model Architecture
@@ -154,14 +154,14 @@ interventions:
 ### Command Line Options
 
 ```bash
-python run_model.py [OPTIONS]
+python -m src.main [OPTIONS]
 
 Options:
   --years YEARS                 Simulation duration (default: 35)
   --population POPULATION       Initial population size (default: 75000)
   --calibrate                   Run calibration before simulation
   --output OUTPUT              Output directory (default: results)
-  --config CONFIG              Configuration file (YAML format)
+  --config CONFIG              Parameter file (JSON; default: config/parameters.json)
   --data-file DATA_FILE        Custom data file for calibration
   --validate-data              Validate input data before running
   --log-level LEVEL            Logging level (DEBUG, INFO, WARNING, ERROR)
@@ -198,10 +198,89 @@ HIV_AIDS_Cameroon_Analysis/
 ├── notebooks/                    # Jupyter notebooks
 ├── results/                      # Output directory
 ├── docs/                         # Documentation
-├── run_model.py                  # Main execution script
+├── src/main.py                   # Main execution script
 ├── requirements.txt              # Python dependencies
 └── README.md                     # This file
 ```
+
+## ⚡ Performance & Acceleration
+
+- Binned mixing: Transmission uses age/risk binned partner pools (5-year bins) to avoid scanning all infected per contact. This reduces per-contact partner selection to O(1) expected time.
+- Optional Numba: Poisson contact counts can be sampled with a Numba-accelerated kernel when available. Enable via model options or CLI.
+
+### Enable Acceleration
+
+- Python API:
+  - `EnhancedHIVModel(params, use_numba=True, mixing_method='binned')`
+- CLI:
+  - `hivec-cm --config config/parameters.json --years 1 --mixing-method binned --use-numba`
+  - Defaults: `mixing_method=binned`, `use_numba` disabled unless flag is passed.
+
+### Benchmark Results
+
+Ran on this machine with `years=1.0`, `dt=0.1` (10 steps). Times in seconds, first-run with JIT cost included for Numba.
+
+```
+     Pop |   Scan (no numba) |  Binned (no numba) |  Binned (numba)
+-------------------------------------------------------------------
+   10000 |             0.565 |              0.507 |           1.075
+   25000 |             2.100 |              1.317 |           1.315
+   50000 |             6.792 |              2.731 |           3.061
+```
+
+Notes:
+- Binned mixing is 2–3x faster than the baseline scan at larger sizes.
+- Numba includes JIT compile cost in the first run above; subsequent runs can be faster, especially for longer simulations or more steps.
+
+### Run the Benchmark Yourself
+
+```
+python scripts/benchmark_transmission.py
+```
+
+If Numba is installed (see `requirements.txt`), the “Binned (numba)” column will report results; otherwise NaN.
+
+## 🖥️ Local UI Options
+
+You can run an interactive local UI to watch the simulation evolve.
+
+- Streamlit (fastest to run locally):
+  - Install deps: `pip install -r requirements.txt`
+  - Run: `streamlit run ui/streamlit_app.py`
+  - Features: live plots (prevalence, ART, infections, population), start/stop controls, Numba + mixing method toggles.
+
+- Plotly Dash (optional):
+  - Included: `ui/dash_app.py`
+  - Run: `python ui/dash_app.py`
+  - Mechanism: background thread + queue; `dcc.Interval` polls updates every 300ms.
+
+- FastAPI + WebSockets + React/D3 (advanced):
+  - Backend included: `ui_server/main.py`
+  - Run API: `uvicorn ui_server.main:app --reload`
+  - Start a run: `POST /api/simulations` (see `ui_server/schemas.py`)
+  - Receive updates: connect `ws://localhost:8000/ws/simulations/{id}`
+  - Frontend: bring your own (React/Typescript + D3 recommended). The model already streams one JSON per simulated year.
+
+## 📄 Manuscripts (LaTeX)
+
+- Generate LaTeX macros from a study (figure paths, labels, config):
+  - `python scripts/generate_latex_labels.py --study-dir results/montecarlo_study/study_YYYYMMDD_HHMMSS --out-dir manuscripts`
+  - This writes: `manuscripts/study_config.tex`, `labels.tex`, `fig_paths.tex`.
+
+- Build ready-made skeletons for four papers (requires `pdflatex`):
+  - Makefile targets (auto-detects latest study):
+    - `make labels` — generate macros
+    - `make methods` — compile Methods paper
+    - `make calibration` — compile Calibration/Validation paper
+    - `make uncertainty` — compile Uncertainty paper
+    - `make fundingcut` — compile Funding-cut Policy paper
+    - `make all` — build all of the above
+  - Override the study directory: `make all STUDY_DIR=results/montecarlo_study/study_YYYYMMDD_HHMMSS`
+
+- Optional artifacts:
+  - Milestones: `make milestones INCIDENCE_THRESHOLD=1.0 INCIDENCE_SCALE=per1000 PREVALENCE_THRESHOLD=2.0 ART_THRESHOLD=90`
+  - Compact PDF report: `make report`
+
 
 ### Contributing
 
