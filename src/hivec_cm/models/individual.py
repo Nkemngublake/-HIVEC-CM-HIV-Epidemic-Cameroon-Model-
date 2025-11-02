@@ -2,6 +2,10 @@ import numpy as np
 from typing import Optional
 from numpy.random import Generator, default_rng
 from .parameters import ModelParameters
+from hivec_cm.core.demographic_parameters import (
+    get_regional_assignment_probabilities,
+    get_regional_hiv_risk_multiplier
+)
 
 class Individual:
     """Enhanced individual agent with detailed characteristics."""
@@ -13,12 +17,17 @@ class Individual:
         gender: str,
         params: ModelParameters,
         rng: Optional[Generator] = None,
+        region: Optional[str] = None,
     ):
         self.id = agent_id
         self.age = age
         self.gender = gender
         self.params = params
         self.rng: Generator = rng or default_rng()
+        
+        # Geographic location
+        self.region = region if region else self._assign_region()
+        self.regional_hiv_risk_multiplier = get_regional_hiv_risk_multiplier(self.region)
         
         # Health status
         self.hiv_status = "susceptible"
@@ -32,6 +41,9 @@ class Individual:
         self.tested = False
         self.diagnosed = False
         self.treatment_experienced = False
+        self.ever_tested = False
+        self.last_test_year = None
+        self.viral_load_suppressed = False
         
         # Social and behavioral characteristics
         self.risk_group = self._assign_risk_group()
@@ -41,6 +53,99 @@ class Individual:
         # Vital events
         self.alive = True
         self.death_cause = None
+        
+        # ===== PHASE 1: ENHANCED DATA COLLECTION ATTRIBUTES =====
+        # Transmission tracking
+        self.transmission_donor_id = None  # ID of person who infected this individual
+        self.transmission_donor_stage = None  # Stage of donor at transmission (acute/chronic/aids)
+        self.transmission_donor_viral_load = None  # VL of donor at transmission
+        self.transmission_year = None  # Year when infection occurred
+        
+        # Testing tracking
+        self.test_history = []  # List of (year, modality) tuples
+        self.testing_modality_last = None  # facility_based, community_based, antenatal, self_test
+        self.cd4_at_diagnosis = None  # CD4 count when first diagnosed
+        self.diagnosis_year = None  # Year when diagnosed
+        
+        # Cascade tracking
+        self.cascade_linkage_year = None  # Year linked to care after diagnosis
+        self.art_regimen = "first_line"  # first_line, second_line, third_line
+        self.ltfu_date = None  # Lost to follow-up date
+        self.return_to_care_date = None  # Date returned after LTFU
+        self.viral_load_rebound_count = 0  # Number of times VL rebounded on ART
+        self.regimen_switches = []  # List of (year, old_regimen, new_regimen) tuples
+        
+        # Partnership tracking (for discordant couple analysis)
+        self.current_partner_id = None  # ID of current partner (if in stable partnership)
+        self.partner_hiv_status = None  # HIV status of partner (for discordant tracking)
+        
+        # ===== PHASE 2: TESTING & CO-INFECTIONS ATTRIBUTES =====
+        # Testing frequency tracking
+        self.total_tests_lifetime = 0  # Total number of HIV tests ever taken
+        self.tests_last_12_months = 0  # Tests in past year
+        self.last_negative_test_year = None  # Most recent negative test
+        self.aware_of_status = False  # Knows they are HIV+
+        
+        # Co-infection tracking
+        self.tb_status = "negative"  # negative, active_tb, latent_tb, on_ipt
+        self.tb_diagnosis_year = None  # Year TB was diagnosed
+        self.on_ipt = False  # Isoniazid preventive therapy
+        self.tb_screened_this_year = False  # Screened for TB this year
+        
+        # Hepatitis co-infection (from CAMPHIA data)
+        self.hbv_status = self._assign_hbv_status()  # HBV co-infection
+        self.hcv_status = "negative"  # HCV status (simplified - rare in Cameroon)
+        
+        # ART adherence & resistance tracking
+        self.adherence_level = 0.95  # Proportion of doses taken (0-1)
+        self.missed_doses_this_month = 0
+        self.drug_resistance = False  # Has developed resistance
+        self.resistance_testing_done = False
+        
+        # ===== PHASE 3: DEMOGRAPHICS & PREVENTION ATTRIBUTES =====
+        # Life years & health tracking
+        self.life_years_lived_with_hiv = 0  # Years lived since infection
+        self.quality_adjusted_life_years = 0  # QALYs (accounting for health state)
+        self.disability_weight = 0.0  # Current health state weight (0=perfect, 1=death)
+        
+        # Orphanhood tracking
+        self.children_ids = []  # List of child Individual IDs
+        self.is_orphan = False  # Lost one or both parents to HIV
+        self.orphan_type = None  # "maternal", "paternal", "double"
+        self.orphan_age_at_loss = None  # Age when became orphan
+        
+        # AIDS-defining illness tracking
+        self.oi_history = []  # List of opportunistic infections
+        self.current_oi = None  # Active OI
+        self.oi_count_lifetime = 0  # Total OIs experienced
+        self.ever_had_tb = False
+        self.ever_had_pcp = False  # Pneumocystis pneumonia
+        self.ever_had_toxo = False  # Toxoplasmosis
+        
+        # VMMC (Voluntary Medical Male Circumcision)
+        self.circumcised = False
+        self.circumcision_type = None  # "medical", "traditional", None
+        self.vmmc_year = None  # Year of medical circumcision
+        
+        # PrEP (Pre-Exposure Prophylaxis)
+        self.on_prep = False
+        self.prep_start_date = None
+        self.prep_stop_date = None
+        self.prep_adherence = 0.0  # Proportion of doses taken
+        self.prep_discontinuation_reason = None  # "side_effects", "seroconverted", "choice"
+        
+        # Fertility tracking
+        self.ever_pregnant_while_hiv_positive = False
+        self.pregnancies_on_art = 0  # Number of pregnancies while on ART
+        self.children_born_while_positive = 0
+        self.fertility_desire = True  # Wants children
+    
+    def _assign_region(self) -> str:
+        """Assign region based on Cameroon population distribution."""
+        regional_probs = get_regional_assignment_probabilities()
+        regions = list(regional_probs.keys())
+        probabilities = list(regional_probs.values())
+        return str(self.rng.choice(regions, p=probabilities))
         
     def _assign_risk_group(self) -> str:
         """Assign risk group based on age and demographics."""
@@ -72,10 +177,33 @@ class Individual:
             self.rng.gamma(rate / self.params.contact_variance, self.params.contact_variance),
         )
     
-    def get_infectivity(self, current_year: float) -> float:
-        """Calculate current infectivity based on HIV status and treatment."""
+    def _assign_hbv_status(self) -> str:
+        """Assign HBV status based on CAMPHIA regional data (PHASE 2)."""
+        from hivec_cm.core.demographic_parameters import get_regional_hepatitis_b_prevalence
+        
+        # Get regional HBV prevalence for this individual's region
+        hbv_prev = get_regional_hepatitis_b_prevalence(self.region)
+        
+        # Check if person has HBV
+        if self.rng.random() < hbv_prev:
+            return "positive"
+        else:
+            return "negative"
+    
+    def get_infectivity(self, current_year: float, time_varying_rate: Optional[float] = None) -> float:
+        """
+        Calculate current infectivity based on HIV status and treatment.
+        
+        Args:
+            current_year: Current simulation year
+            time_varying_rate: Optional time-varying base transmission rate.
+                             If provided, overrides params.base_transmission_rate
+        """
         if self.hiv_status == "susceptible":
             return 0.0
+        
+        # Use time-varying rate if provided, otherwise use static rate
+        base_rate = time_varying_rate if time_varying_rate is not None else self.params.base_transmission_rate
         
         # Base infectivity by stage
         stage_multipliers = {
@@ -84,8 +212,7 @@ class Individual:
             'aids': self.params.aids_multiplier
         }
         
-        base_infectivity = (self.params.base_transmission_rate * 
-                           stage_multipliers.get(self.hiv_status, 1.0))
+        base_infectivity = base_rate * stage_multipliers.get(self.hiv_status, 1.0)
         
         # Viral load effect (simplified)
         if hasattr(self, 'viral_load'):
@@ -190,13 +317,13 @@ class Individual:
         elif current_year < 2010:
             testing_rate = 0.18  # Enhanced: Better VCT scale-up
         elif current_year < 2018:
-            testing_rate = 0.32  # Enhanced: Accelerated testing expansion  
+            testing_rate = 0.32  # Enhanced: Accelerated testing expansion
         else:
             testing_rate = 0.55  # Enhanced: Aggressive "Test and Treat"
         
         # Funding cut scenario
-        if (self.params.funding_cut_scenario and 
-            current_year >= self.params.funding_cut_year):
+        if (self.params.funding_cut_scenario and
+                current_year >= self.params.funding_cut_year):
             testing_rate *= (1.0 - self.params.funding_cut_magnitude)
         
         # Risk group multiplier for testing
@@ -206,13 +333,57 @@ class Individual:
             testing_rate *= 0.5
         
         if self.rng.random() < testing_rate * dt:
+            # PHASE 1 ENHANCEMENT: Track testing modality
+            self.testing_modality_last = self._determine_testing_modality(current_year)
+            self.test_history.append((current_year, self.testing_modality_last))
+            self.ever_tested = True
+            self.last_test_year = current_year
+            
             self.tested = True
             # Test accuracy
             if self.rng.random() < 0.98:  # 98% accuracy
                 self.diagnosed = True
+                # PHASE 1 ENHANCEMENT: Record CD4 at diagnosis (late diagnosis tracking)
+                self.cd4_at_diagnosis = self.cd4_count
+                self.diagnosis_year = current_year
+    
+    def _determine_testing_modality(self, current_year: float) -> str:
+        """Determine how the person got tested (PHASE 1 ENHANCEMENT)."""
+        # Probability distribution for testing modalities changes over time
+        
+        # Pregnant women
+        if self.gender == 'F' and 20 <= self.age <= 45:
+            if self.rng.random() < 0.4:  # 40% chance of antenatal testing
+                return 'antenatal'
+        
+        # Before 2010: mostly facility-based
+        if current_year < 2010:
+            modality_probs = {'facility_based': 0.85, 'community_based': 0.15}
+        # 2010-2017: expansion of community testing
+        elif current_year < 2018:
+            modality_probs = {'facility_based': 0.60, 'community_based': 0.35, 'self_test': 0.05}
+        # 2018+: self-testing introduced, index testing
+        else:
+            modality_probs = {
+                'facility_based': 0.45,
+                'community_based': 0.30,
+                'self_test': 0.15,
+                'index_testing': 0.10
+            }
+        
+        modalities = list(modality_probs.keys())
+        probs = list(modality_probs.values())
+        return str(self.rng.choice(modalities, p=probs))
+
     
     def _consider_treatment_initiation(self, dt: float, current_year: float):
         """Consider starting antiretroviral treatment."""
+        # PHASE 1 ENHANCEMENT: Track linkage to care
+        if self.diagnosed and not self.cascade_linkage_year:
+            # Assume linkage happens relatively quickly after diagnosis
+            if self.rng.random() < 0.8 * dt:  # 80% linkage probability
+                self.cascade_linkage_year = current_year
+        
         # Treatment eligibility based on CD4 count and year
         if current_year >= 2016:
             eligible = True  # "Treat All" policy
@@ -224,8 +395,8 @@ class Individual:
                 cd4_threshold = 350  # WHO guidelines 2010-2012
             else:
                 cd4_threshold = 500  # WHO guidelines 2013+
-            eligible = (self.hiv_status == "aids" or 
-                       self.cd4_count <= cd4_threshold)
+            eligible = (self.hiv_status == "aids" or
+                        self.cd4_count <= cd4_threshold)
 
         # Time-varying initiation probability
         if current_year < 2004.75:  # October 2004
@@ -236,15 +407,13 @@ class Individual:
             initiation_factor = 1.0  # PEPFAR/Global Fund scale-up
 
         # Funding cut scenario
-        if (self.params.funding_cut_scenario and 
-            current_year >= self.params.funding_cut_year):
+        if (self.params.funding_cut_scenario and
+                current_year >= self.params.funding_cut_year):
             initiation_factor *= (1.0 - self.params.funding_cut_magnitude)
         
-        if (
-            eligible
-            and self.rng.random()
-            < self.params.treatment_initiation_prob * initiation_factor * dt
-        ):
+        if (eligible and self.rng.random() < 
+                self.params.treatment_initiation_prob * initiation_factor * dt):
             self.on_art = True
             self.art_start_time = self.infection_time
             self.treatment_experienced = True
+

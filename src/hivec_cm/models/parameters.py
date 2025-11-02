@@ -5,7 +5,7 @@ from typing import Dict, Union
 @dataclass
 class ModelParameters:
     """
-    Comprehensive parameters for the HIV/AIDS epidemic model.
+    Parameters for the HIV/AIDS epidemic model.
     All rates are annual unless specified otherwise.
     """
     # Population parameters
@@ -51,6 +51,15 @@ class ModelParameters:
     # Scenario parameters
     funding_cut_scenario: bool
     funding_cut_year: int
+    
+    # Time-varying transmission parameters (with defaults)
+    use_time_varying_transmission: bool = True
+    emergence_phase_multiplier: float = 0.80
+    emergence_phase_end: float = 1990
+    growth_phase_multiplier: float = 1.20
+    growth_phase_end: float = 2005
+    decline_phase_multiplier: float = 1.0
+    
     # Optional magnitudes for funding-cut effects referenced in the model
     funding_cut_magnitude: float = 0.0
     kp_prevention_cut_magnitude: float = 0.0
@@ -117,6 +126,25 @@ def load_parameters(path: str) -> ModelParameters:
         ),
         funding_cut_scenario=params['scenario']['funding_cut_scenario'],
         funding_cut_year=params['scenario']['funding_cut_year'],
+        # Time-varying transmission parameters
+        use_time_varying_transmission=params['transmission'].get(
+            'use_time_varying_transmission', True
+        ),
+        emergence_phase_multiplier=params['transmission'].get(
+            'emergence_phase_multiplier', 0.80
+        ),
+        emergence_phase_end=params['transmission'].get(
+            'emergence_phase_end', 1990
+        ),
+        growth_phase_multiplier=params['transmission'].get(
+            'growth_phase_multiplier', 1.20
+        ),
+        growth_phase_end=params['transmission'].get(
+            'growth_phase_end', 2005
+        ),
+        decline_phase_multiplier=params['transmission'].get(
+            'decline_phase_multiplier', 1.0
+        ),
         funding_cut_magnitude=(
             params.get('scenario', {}).get('funding_cut_magnitude', 0.0)
         ),

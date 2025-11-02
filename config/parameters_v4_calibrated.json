@@ -1,0 +1,356 @@
+{
+    "model_info": {
+        "version": "4.0",
+        "description": "HIVEC-CM: HIV Epidemic Cameroon Model - Calibrated Parameters",
+        "created": "2025-10-09T00:00:00Z",
+        "notes": "Unified parameter system with historical calibration and scenario modifications"
+    },
+    "calibration_targets": {
+        "source": "UNAIDS Cameroon estimates 2023",
+        "hiv_prevalence": {
+            "1990": 0.013,
+            "2000": 0.045,
+            "2010": 0.037,
+            "2022": 0.028
+        },
+        "confidence_intervals": {
+            "1990": [0.010, 0.016],
+            "2000": [0.040, 0.051],
+            "2010": [0.032, 0.043],
+            "2022": [0.024, 0.032]
+        }
+    },
+    "camphia_2017": {
+        "source": "Cameroon Population-based HIV Impact Assessment 2017",
+        "prevalence_by_age_sex": {
+            "male_15_24": 0.018,
+            "male_25_34": 0.025,
+            "male_35_49": 0.032,
+            "female_15_24": 0.029,
+            "female_25_34": 0.042,
+            "female_35_49": 0.048
+        },
+        "cascade_95_95_95": {
+            "aware_of_status": 0.68,
+            "on_art": 0.58,
+            "virally_suppressed": 0.49
+        },
+        "viral_load_suppression": {
+            "suppressed_below_1000": 0.75,
+            "suppressed_below_400": 0.68
+        }
+    },
+    "demographics": {
+        "birth_rate": {
+            "source": "World Bank World Development Indicators, Cameroon 1960-2023",
+            "unit": "per_person_per_year",
+            "historical_series": {
+                "1985": 0.044648,
+                "1990": 0.043643,
+                "2000": 0.044,
+                "2010": 0.038,
+                "2020": 0.0353,
+                "2022": 0.034
+            },
+            "projection": {
+                "2030": 0.032,
+                "2040": 0.028,
+                "2050": 0.025
+            }
+        },
+        "death_rate": {
+            "source": "World Bank World Development Indicators",
+            "unit": "per_person_per_year",
+            "historical_series": {
+                "1985": 0.0137,
+                "1990": 0.0124,
+                "2000": 0.0135,
+                "2010": 0.0113,
+                "2020": 0.0089,
+                "2022": 0.0085
+            }
+        }
+    },
+    "prevention": {
+        "condom_distribution": {
+            "description": "Condom distribution and use rates over time",
+            "source": "Cameroon national HIV prevention programs",
+            "historical_coverage": {
+                "1985_1999": {
+                    "value": 0.12,
+                    "note": "Pre-2000 baseline"
+                },
+                "2000_2009": {
+                    "start": 0.12,
+                    "end": 0.35,
+                    "interpolation": "linear",
+                    "note": "Early prevention scale-up"
+                },
+                "2010_2017": {
+                    "start": 0.35,
+                    "end": 0.65,
+                    "interpolation": "linear",
+                    "note": "Accelerated distribution"
+                },
+                "2018_2023": {
+                    "value": 0.65,
+                    "note": "Sustained high coverage"
+                }
+            },
+            "transition_year": 2024,
+            "scenario_targets": {
+                "baseline": 0.65,
+                "optimistic": 0.75,
+                "pessimistic": 0.50
+            }
+        },
+        "prep_coverage": {
+            "description": "PrEP coverage for key populations",
+            "historical_coverage": {
+                "2010_2019": 0.0,
+                "2020_2023": 0.10
+            },
+            "scenario_targets": {
+                "baseline": 0.10,
+                "optimistic": 0.30,
+                "pessimistic": 0.05
+            }
+        }
+    },
+    "testing": {
+        "general_population": {
+            "description": "HIV testing rates in general population",
+            "source": "Cameroon DHS and CAMPHIA surveys",
+            "historical_coverage": {
+                "1985_1999": {
+                    "value": 0.02,
+                    "note": "Minimal testing availability"
+                },
+                "2000_2009": {
+                    "start": 0.02,
+                    "end": 0.12,
+                    "interpolation": "exponential",
+                    "note": "Testing scale-up begins"
+                },
+                "2010_2019": {
+                    "start": 0.12,
+                    "end": 0.29,
+                    "interpolation": "linear",
+                    "note": "Rapid expansion"
+                },
+                "2020_2023": {
+                    "value": 0.29,
+                    "note": "Current level (CAMPHIA 2017 baseline)"
+                }
+            },
+            "transition_year": 2024,
+            "scenario_targets": {
+                "baseline": 0.29,
+                "optimistic": 0.38,
+                "pessimistic": 0.22
+            }
+        },
+        "key_populations": {
+            "description": "Targeted testing for FSW, MSM, PWID",
+            "historical_coverage": {
+                "2010_2023": 0.45
+            },
+            "scenario_targets": {
+                "baseline": 0.45,
+                "optimistic": 0.60,
+                "pessimistic": 0.35
+            }
+        }
+    },
+    "art_program": {
+        "availability": {
+            "start_year": 2004,
+            "note": "ART became available in Cameroon in 2004"
+        },
+        "initiation": {
+            "description": "Rate at which diagnosed individuals initiate ART",
+            "source": "Cameroon national ART program data",
+            "historical_rates": {
+                "2004_2009": 0.30,
+                "2010_2015": {
+                    "start": 0.30,
+                    "end": 0.65,
+                    "interpolation": "linear"
+                },
+                "2016_2022": {
+                    "start": 0.65,
+                    "end": 0.85,
+                    "interpolation": "linear"
+                },
+                "2023": 0.85
+            },
+            "transition_year": 2024,
+            "scenario_targets": {
+                "baseline": 0.85,
+                "optimistic": 0.92,
+                "pessimistic": 0.75
+            }
+        },
+        "retention_12_months": {
+            "description": "Proportion retained on ART at 12 months",
+            "historical_rates": {
+                "2004_2010": 0.70,
+                "2011_2020": {
+                    "start": 0.70,
+                    "end": 0.90,
+                    "interpolation": "linear"
+                },
+                "2021_2023": 0.90
+            },
+            "scenario_targets": {
+                "baseline": 0.90,
+                "optimistic": 0.95,
+                "pessimistic": 0.83
+            }
+        },
+        "retention_24_months": {
+            "description": "Proportion retained on ART at 24 months",
+            "historical_rates": {
+                "2004_2010": 0.60,
+                "2011_2020": {
+                    "start": 0.60,
+                    "end": 0.85,
+                    "interpolation": "linear"
+                },
+                "2021_2023": 0.85
+            },
+            "scenario_targets": {
+                "baseline": 0.85,
+                "optimistic": 0.92,
+                "pessimistic": 0.78
+            }
+        },
+        "viral_suppression": {
+            "description": "Viral suppression rate among those on ART",
+            "source": "CAMPHIA 2017",
+            "historical_rates": {
+                "2004_2010": 0.55,
+                "2011_2020": {
+                    "start": 0.55,
+                    "end": 0.75,
+                    "interpolation": "linear"
+                },
+                "2021_2023": 0.75
+            },
+            "scenario_targets": {
+                "baseline": 0.75,
+                "optimistic": 0.85,
+                "pessimistic": 0.68
+            }
+        },
+        "treatment_interruption": {
+            "description": "Rate of treatment interruptions due to stockouts",
+            "historical_rates": {
+                "2004_2015": 0.15,
+                "2016_2023": 0.05
+            },
+            "scenario_targets": {
+                "baseline": 0.05,
+                "optimistic": 0.02,
+                "pessimistic": 0.08
+            }
+        }
+    },
+    "pmtct": {
+        "anc_coverage": {
+            "description": "Antenatal care attendance rate",
+            "source": "Cameroon DHS",
+            "historical_coverage": {
+                "1985_2002": 0.40,
+                "2003_2010": {
+                    "start": 0.40,
+                    "end": 0.70,
+                    "interpolation": "linear"
+                },
+                "2011_2019": {
+                    "start": 0.70,
+                    "end": 0.85,
+                    "interpolation": "linear"
+                },
+                "2020_2023": 0.85
+            },
+            "scenario_targets": {
+                "baseline": 0.85,
+                "optimistic": 0.92,
+                "pessimistic": 0.78
+            }
+        },
+        "testing_at_anc": {
+            "description": "HIV testing rate at ANC visits",
+            "historical_coverage": {
+                "1985_2002": 0.20,
+                "2003_2010": {
+                    "start": 0.20,
+                    "end": 0.70,
+                    "interpolation": "linear"
+                },
+                "2011_2023": 0.80
+            },
+            "scenario_targets": {
+                "baseline": 0.80,
+                "optimistic": 0.90,
+                "pessimistic": 0.72
+            }
+        },
+        "art_coverage_pregnant": {
+            "description": "ART coverage for HIV+ pregnant women",
+            "historical_coverage": {
+                "1985_2002": 0.0,
+                "2003_2010": {
+                    "start": 0.0,
+                    "end": 0.40,
+                    "interpolation": "linear"
+                },
+                "2011_2019": {
+                    "start": 0.40,
+                    "end": 0.75,
+                    "interpolation": "linear"
+                },
+                "2020_2023": 0.75
+            },
+            "scenario_targets": {
+                "baseline": 0.75,
+                "optimistic": 0.88,
+                "pessimistic": 0.65
+            }
+        }
+    },
+    "funding_scenarios": {
+        "description": "Funding multipliers and their effects",
+        "baseline": {
+            "multiplier": 1.0,
+            "description": "Status quo funding"
+        },
+        "optimistic": {
+            "multiplier": 1.2,
+            "description": "20% increase in funding",
+            "sensitivity_by_category": {
+                "testing": 0.8,
+                "art": 0.5,
+                "prevention": 0.7,
+                "pmtct": 0.6
+            }
+        },
+        "pessimistic": {
+            "multiplier": 0.8,
+            "description": "20% decrease in funding",
+            "sensitivity_by_category": {
+                "testing": 0.8,
+                "art": 0.5,
+                "prevention": 0.7,
+                "pmtct": 0.6
+            }
+        }
+    },
+    "transition_parameters": {
+        "description": "Parameters controlling transition from historical to scenario-specific values",
+        "default_transition_year": 2024,
+        "transition_duration_years": 2,
+        "interpolation_method": "smooth_sigmoid"
+    }
+}

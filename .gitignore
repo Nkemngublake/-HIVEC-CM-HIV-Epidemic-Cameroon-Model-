@@ -1,7 +1,18 @@
+# ============================================================================
 # HIVEC-CM: HIV Epidemic Cameroon Model - .gitignore
-# =====================================================
+# ============================================================================
+# Excludes unnecessary files from version control
+# Last updated: November 2, 2025
+# 
+# INCLUDE IN GITHUB: Source code, documentation, configs, tests, Docker
+# EXCLUDE FROM GITHUB: Results, large data, logs, temp files, build artifacts
+# ============================================================================
 
-# Python
+# ============================================================================
+# PYTHON DEVELOPMENT
+# ============================================================================
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -26,6 +37,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+pip-wheel-metadata/
 
 # PyInstaller
 *.manifest
@@ -48,9 +60,12 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+cover/
+test-results/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb_checkpoints/
 
 # IPython
 profile_default/
@@ -80,6 +95,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.conda/
 
 # Spyder project settings
 .spyderproject
@@ -99,77 +115,421 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# HIVEC-CM Specific Files
-# ========================
+# pytype static type analyzer
+.pytype/
 
-# Large simulation outputs (keep examples but exclude bulk results)
-Simulation_results_scenarios/*.csv
-Simulation_results_scenarios/*.png
-figures/*.png
-figures/*.jpg
-figures/*.pdf
-results/**
-model_outputs/
+# Cython debug symbols
+cython_debug/
 
-# Timestamped analysis files
+# ============================================================================
+# SIMULATION RESULTS & OUTPUTS (EXCLUDE ALL - TOO LARGE FOR GITHUB)
+# ============================================================================
+
+# All results directories - contain simulation outputs, CSV files, plots
+results/
+!results/.gitkeep
+!results/README.md
+
+# Validation outputs
+validation_outputs/
+validation/calibration_run.log
+validation/test_*.json
+
+# Specific result types to always exclude
+*.simulation_results.csv
+*_simulation_*.csv
+*_montecarlo_*.csv
+*_scenario_*.csv
+execution_log_*.txt
+
+# Plots generated from results
+*_prevalence_*.png
+*_cascade_*.png
+*_diagnostics_*.png
+*_trajectory_*.png
+*_comparison_*.png
+comprehensive_diagnostics.png
+
+# Large aggregated data
+summary_stats_*.json
+aggregated_results_*.json
+combined_scenarios_*.csv
+
+# ============================================================================
+# TEMPORARY & CACHE FILES
+# ============================================================================
+
+# Temporary directories
+tmp/
+temp/
+cache/
+.cache/
+test_results/
+scratch/
+
+# Timestamped files
 Quick_Preview_*.png
 Enhanced_Parameters_Test_*.png
 CORRECTED_*.csv
 CORRECTED_*.png
 EXTENDED_*.csv
 EXTENDED_*.png
-*_20250805_*.csv
-*_20250805_*.png
+*_202[0-9][0-9][0-9][0-9][0-9]_*.csv
+*_202[0-9][0-9][0-9][0-9][0-9]_*.png
+*_202[0-9][0-9][0-9][0-9][0-9]_*.json
 
-# Temporary files
-tmp/
-temp/
-cache/
-.cache/
-test_results/
+# ============================================================================
+# DOCUMENTATION - KEEP ESSENTIAL, EXCLUDE REDUNDANT SUMMARIES
+# ============================================================================
 
-# Log files
-*.log
-logs/
+# Exclude old/temporary documentation versions
+*_OLD.md
+*_BACKUP.md
+*_ARCHIVE.md
+*_DEPRECATED.md
+*_TEMP.md
+*_DRAFT.md
+*_v[0-9].md
+*_v[0-9][0-9].md
 
-# Large data files (keep sample data but exclude bulk datasets)
+# Exclude session summaries (keep final reports only)
+SESSION_*.md
+!SESSION_COMPLETE_TIME_VARYING.md
+
+# Exclude interim status files
+*_STATUS.md
+*_PROGRESS.md
+*_INCOMPLETE.md
+
+# Keep essential documentation
+!README.md
+!LICENSE
+!CHANGELOG.md
+!docs/**/*.md
+!TIME_VARYING_FINAL_REPORT.md
+!TIME_VARYING_QUICK_REFERENCE.md
+!MODEL_VALIDATION_README.md
+!SCENARIO_IMPLEMENTATION_COMPLETE.md
+
+# ============================================================================
+# DATA FILES (EXCLUDE LARGE, KEEP VALIDATION TARGETS)
+# ============================================================================
+
+# Large raw data files
 data/raw/*.zip
 data/raw/*.csv
+data/raw/*.xlsx
+data/raw/*.tar.gz
 data/processed/large_*.csv
+data/processed/large_*.json
 data/cache/
 
-# IDE and OS specific
+# Binary data formats
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.feather
+*.parquet
+
+# Keep essential validation and configuration data
+!data/validation_targets/*.json
+!data/validation_targets/*.csv
+!config/*.json
+!config/parameters*.json
+
+# Keep UN data fetching tools but not cached results
+!data/un_data/*.py
+!data/un_data/README.md
+data/un_data/cache/
+data/un_data/*.csv
+data/un_data/*.json
+!data/un_data/un_api_config.json
+
+# ============================================================================
+# LOG FILES
+# ============================================================================
+
+# All log files
+*.log
+logs/
+*.log.*
+log_*.txt
+saint_seya_detailed_simulation.log
+extract_detailed_log.txt
+
+# ============================================================================
+# IDE & EDITOR FILES
+# ============================================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================================================
+# OPERATING SYSTEM FILES
+# ============================================================================
+
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+.AppleDouble
+.LSOverride
+Icon
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
 
-# Personal configuration
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# LATEX & MANUSCRIPT FILES
+# ============================================================================
+
+# LaTeX auxiliary files
+manuscripts/*.aux
+manuscripts/*.bbl
+manuscripts/*.blg
+manuscripts/*.fdb_latexmk
+manuscripts/*.fls
+manuscripts/*.log
+manuscripts/*.out
+manuscripts/*.synctex.gz
+manuscripts/*.toc
+manuscripts/*.lof
+manuscripts/*.lot
+manuscripts/*.nav
+manuscripts/*.snm
+manuscripts/*.vrb
+
+# Keep final PDFs but exclude drafts
+manuscripts/*_draft*.pdf
+manuscripts/*_v[0-9]*.pdf
+
+# ============================================================================
+# CONFIGURATION FILES - KEEP DEFAULTS, EXCLUDE PERSONAL
+# ============================================================================
+
+# Personal/local configuration
 config/personal_*.json
 config/local_*.py
+config/private_*.json
+config/*_local.json
+config/*_test_*.json
+config/parameters_test_*.json
+
+# Secrets and credentials  
+.secrets
+secrets.json
+credentials.json
+*.pem
+*.key
+.env.local
+.env.*.local
+api_keys.json
+tokens.json
+
+# Keep default configurations
+!config/parameters.json
+!config/parameters_calibrated.json
+!config/parameters_v4_calibrated.json
+!config/README.md
+
+# ============================================================================
+# BACKUP & TEMPORARY FILES
+# ============================================================================
 
 # Backup files
 *.bak
 *.backup
+*.old
+*.orig
+*~
+\#*\#
 
-# LaTeX build artifacts
-manuscripts/*.aux
-manuscripts/*.fdb_latexmk
-manuscripts/*.fls
-manuscripts/*.synctex.gz
+# Temporary files
+*.tmp
+*.temp
+*.swp
 
-# Keep these important files
+# ============================================================================
+# EXCEPTIONS - ALWAYS KEEP THESE CRITICAL FILES
+# ============================================================================
+
+# Core documentation
 !README.md
 !LICENSE
+!CHANGELOG.md
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+
+# Package configuration
 !requirements.txt
+!pyproject.toml
+!setup.py
+!setup.cfg
+!Makefile
+!manifest.in
+
+# Documentation directory (all markdown files)
+!docs/
+!docs/**/*.md
+!docs/**/*.rst
+
+# Source code (all Python files in src/)
+!src/
+!src/**/*.py
+!src/**/__init__.py
+
+# Scripts (consolidated scripts only - exclude archived)
+!scripts/
+!scripts/*.py
+!scripts/*.sh
+scripts/_archived/
+scripts/__pycache__/
+
+# Tests (all test files)
+!tests/
+!tests/**/*.py
+!test_*.py
+
+# Examples and tutorials
 !examples/
-!data/sample/
-!figures/example_*.png
+!examples/**/*.py
+!examples/**/*.ipynb
+!tutorials/
+!tutorials/**/*.ipynb
+
+# Configuration files (defaults only)
+!config/parameters.json
+!config/parameters_calibrated.json
+
+# Validation targets (essential data)
+!data/validation_targets/
+!data/validation_targets/**/*.json
+
+# CI/CD configuration
+!.github/
+!.github/**/*.yml
+!.gitlab-ci.yml
+!.travis.yml
+!azure-pipelines.yml
+
+# Docker configuration and files
+!Dockerfile
+!docker-compose.yml
+!.dockerignore
+!docker/
+!docker/**/*.yml
+!docker/**/*Dockerfile*
+!docker/**/*.sh
+!docker/README.md
+
+# ============================================================================
+# PROJECT-SPECIFIC EXCLUSIONS
+# ============================================================================
+
+# UI server database and sessions
+ui_server/*.db
+ui_server/sessions/
+ui_server/uploads/
+
+# Notebook outputs (keep source, exclude execution results)
+*.ipynb_checkpoints/
+*-checkpoint.ipynb
+analysis_publication_ready.ipynb.bak
+
+# Specific large files to exclude
+generate_simulation_plots.py.bak
+execution_log_*.txt
+
+# Archived scripts (consolidated into 5 main scripts)
+scripts/_archived/
+
+# Temporary shell scripts and logs
+run_remaining_scenarios.sh
+run_all_scenarios.sh.bak
+run_saint_seya_simulation.sh
+check_saint_seya_status.sh
+rebuild_docker_ui.sh
+saint_seya_detailed_simulation.log
+extract_detailed_log.txt
+
+# Docker build artifacts
+docker/.env
+docker/volumes/
+
+# UI compilation artifacts
+ui/__pycache__/
+ui/.streamlit/
+ui_server/__pycache__/
+
+# ============================================================================
+# END OF .gitignore
+# ============================================================================
+# 
+# SUMMARY OF WHAT'S INCLUDED IN GITHUB (DEPLOYMENT-READY):
+# ✓ All source code (src/hivec_cm/)
+# ✓ 5 consolidated scripts (scripts/*.py) - run_simulation, analyze_results, 
+#   generate_plots, monitor, validation
+# ✓ All tests (tests/, test_*.py)
+# ✓ Documentation (docs/, README.md, *.md)
+# ✓ Configuration (config/parameters*.json, requirements.txt, pyproject.toml)
+# ✓ Validation targets (data/validation_targets/)
+# ✓ Docker configuration (docker/, Dockerfile, docker-compose.yml)
+# ✓ UI application (ui/app.py, ui/dash_app.py)
+# ✓ Examples and tutorials
+# 
+# SUMMARY OF WHAT'S EXCLUDED FROM GITHUB:
+# ✗ Simulation results (results/) - too large, user-generated
+# ✗ Large data files (data/raw/, data/processed/)
+# ✗ Logs and temporary files (*.log, extract_*.txt)
+# ✗ IDE and OS files (.vscode/, .DS_Store, etc.)
+# ✗ Personal configurations (config/*_test_*.json)
+# ✗ Python cache and build artifacts (__pycache__/, *.pyc)
+# ✗ Archived scripts (scripts/_archived/) - preserved locally only
+# ✗ Temporary shell scripts (run_saint_seya_simulation.sh, etc.)
+# ✗ Docker volumes and build artifacts
+# ============================================================================

@@ -1,0 +1,123 @@
+{
+  "api_endpoint": "https://population.un.org/dataportalapi/api/v1",
+  "bearer_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImJsYWtlbmtlbW5ndUBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiMTU3MDQzIiwiZXhwIjoyNzI0NTQwODAwLCJpc3MiOiJEb3ROZXRKV1RBdXRoZW50aWNhdGlvbiIsImF1ZCI6IkRvdE5ldEpXVEF1dGhlbnRpY2F0aW9uIn0.uYmJZA7_0gZXpG5wC5wvvGP3PcIVTx4rMj7wVRG5DZc",
+  "location": {
+    "cameroon": {
+      "code": 120,
+      "name": "Cameroon"
+    }
+  },
+  "indicators": {
+    "demographic": {
+      "population_total": {
+        "code": 47,
+        "name": "Total population (thousands)",
+        "description": "De facto population as of 1 July"
+      },
+      "population_by_age_sex": {
+        "code": 60,
+        "name": "Population by age and sex (thousands)",
+        "description": "De facto population by 5-year age groups and sex"
+      },
+      "births": {
+        "code": 155,
+        "name": "Births (thousands)",
+        "description": "Live births during the year"
+      },
+      "deaths": {
+        "code": 156,
+        "name": "Deaths (thousands)",
+        "description": "Deaths during the year"
+      },
+      "death_rate_age_specific": {
+        "code": 194,
+        "name": "Age-specific mortality rate",
+        "description": "Deaths per 1,000 population by 5-year age groups"
+      },
+      "fertility_rate": {
+        "code": 68,
+        "name": "Total fertility rate",
+        "description": "Average number of children per woman"
+      },
+      "life_expectancy": {
+        "code": 67,
+        "name": "Life expectancy at birth",
+        "description": "Years of life expected at birth"
+      }
+    },
+    "hiv": {
+      "hiv_prevalence_15_49": {
+        "code": 102,
+        "name": "HIV prevalence, ages 15-49 (%)",
+        "description": "Percentage of population aged 15-49 living with HIV"
+      },
+      "hiv_deaths": {
+        "code": 105,
+        "name": "HIV/AIDS deaths (thousands)",
+        "description": "Number of deaths due to HIV/AIDS"
+      },
+      "new_hiv_infections": {
+        "code": 103,
+        "name": "New HIV infections (thousands)",
+        "description": "Number of new HIV infections"
+      },
+      "pmtct_coverage": {
+        "code": 106,
+        "name": "PMTCT coverage (%)",
+        "description": "Percentage of pregnant women living with HIV receiving ART"
+      }
+    }
+  },
+  "time_period": {
+    "calibration": {
+      "start": 1990,
+      "end": 2015,
+      "description": "Period for model calibration"
+    },
+    "validation": {
+      "start": 2016,
+      "end": 2023,
+      "description": "Period for out-of-sample validation"
+    },
+    "full": {
+      "start": 1990,
+      "end": 2023,
+      "description": "Full period for comparison"
+    }
+  },
+  "validation_metrics": {
+    "acceptance_criteria": {
+      "r_squared": {
+        "threshold": 0.85,
+        "description": "Coefficient of determination"
+      },
+      "relative_error": {
+        "threshold": 0.15,
+        "description": "Maximum acceptable relative error"
+      },
+      "nash_sutcliffe": {
+        "threshold": 0.70,
+        "description": "Nash-Sutcliffe efficiency"
+      },
+      "coverage_probability": {
+        "threshold": 0.90,
+        "description": "90% prediction interval coverage"
+      }
+    },
+    "metrics_to_calculate": [
+      "MAE",
+      "RMSE", 
+      "MAPE",
+      "R²",
+      "NSE",
+      "Bias",
+      "Coverage_90CI"
+    ]
+  },
+  "notes": {
+    "token_expiry": "2056-04-15",
+    "user": "blakenkemngu@gmail.com",
+    "created": "2024",
+    "purpose": "Model validation against UN Population Division authoritative data"
+  }
+}

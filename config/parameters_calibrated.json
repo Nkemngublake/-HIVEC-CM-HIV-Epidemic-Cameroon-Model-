@@ -27,8 +27,8 @@
     },
     "parameters": {
         "population": {
-            "initial_population": 50000,
-            "initial_population_note": "PHASE 3: Increased to 50K agents (1 agent = ~238 real people) to reduce stochastic extinction",
+            "initial_population": 10000,
+            "initial_population_note": "Agent-based model with 1 agent = ~1190 real people (Cameroon ~11.9M in 1990)",
             "birth_rate": {
                 "min": 0.0337,
                 "max": 0.0461,
@@ -126,23 +126,13 @@
             }
         },
         "transmission": {
-            "base_transmission_rate": 0.0025,
-            "base_transmission_rate_note": "PHASE 3: Using 0.0025 (worked in Phase 1 iter 6 with smaller pop)",
-            "initial_hiv_prevalence": 0.0002,
-            "initial_hiv_prevalence_note": "TIME-VARYING v6: Balance - 0.02% (10 agents) avoids extinction but allows growth to 0.5% by 1990",
+            "base_transmission_rate": 0.00311336,
+            "base_transmission_rate_note": "CALIBRATED: Original 0.0035 * transmission_multiplier 0.889 = 0.00311",
+            "initial_hiv_prevalence": 0.0031219,
+            "initial_hiv_prevalence_note": "CALIBRATED: Optimized to match UNAIDS 1990 prevalence of 0.5%",
             "acute_multiplier": 8.0,
             "chronic_multiplier": 1.0,
-            "aids_multiplier": 3.0,
-            "use_time_varying_transmission": true,
-            "use_time_varying_transmission_note": "Enable time-varying transmission rates to match epidemic phases",
-            "emergence_phase_multiplier": 0.80,
-            "emergence_phase_multiplier_note": "1985-1990: SLOW emergence - use 0.8x to grow from 0.02% to ~0.5% by 1990",
-            "emergence_phase_end": 1990,
-            "growth_phase_multiplier": 6.00,
-            "growth_phase_multiplier_note": "1990-2007: EXPLOSIVE growth (0.5% → 5.2%) - very high transmission pre-ART era",
-            "growth_phase_end": 2007,
-            "decline_phase_multiplier": 4.00,
-            "decline_phase_multiplier_note": "2007+: VERY HIGH baseline (4.0x) to counteract strong ART suppression - maintains elevated prevalence ~2-3% range"
+            "aids_multiplier": 3.0
         },
         "disease_progression": {
             "acute_duration_months": 3.0,

@@ -1,0 +1,221 @@
+{
+  "model_info": {
+    "version": "3.1",
+    "description": "HIVEC-CM: HIV Epidemic Cameroon Model - CALIBRATED VERSION",
+    "created": "2025-10-25T21:17:00Z",
+    "calibration_note": "This version includes calibrated parameters from automated optimization against UNAIDS Cameroon data 1990-2015. Calibration completed with final error: 11.769, 960 iterations."
+  },
+  "calibration_metadata": {
+    "calibration_date": "2025-10-25",
+    "calibration_method": "differential_evolution",
+    "calibration_period": "1990-2015",
+    "validation_period": "2016-2023",
+    "final_error": 11.768727997193224,
+    "iterations": 960,
+    "optimal_parameters": {
+      "transmission_multiplier": 0.8889606641569505,
+      "contact_rate_multiplier": 1.6487486352585994,
+      "initial_prevalence_1990": 0.0031219037994094033,
+      "risk_group_multiplier": 3.48234192645343
+    },
+    "parameter_notes": {
+      "transmission_multiplier": "Applied to base_transmission_rate: 0.0035 * 0.889 = 0.00311",
+      "contact_rate_multiplier": "Applied to mean_contacts_per_year: 2.5 * 1.649 = 4.12",
+      "initial_prevalence_1990": "Replaces initial_hiv_prevalence: 0.00312 (0.312%)",
+      "risk_group_multiplier": "Applied to high-risk group multiplier: 15.0 * 3.482 / 15.0 = 3.482 relative boost"
+    }
+  },
+  "parameters": {
+    "population": {
+      "initial_population": 50000,
+      "initial_population_note": "PHASE 3: Increased to 50K agents (1 agent = ~238 real people) to reduce stochastic extinction",
+      "birth_rate": {
+        "min": 0.0337,
+        "max": 0.0461,
+        "unit": "per_person_per_year",
+        "source": "World Bank World Development Indicators, Cameroon crude birth rate 1960-2023",
+        "note": "Converted from crude birth rate per 1000 people to per person per year by dividing by 1000.",
+        "series": {
+          "1990": 0.043643,
+          "1991": 0.043468,
+          "1992": 0.043082,
+          "1993": 0.042664,
+          "1994": 0.042247,
+          "1995": 0.041734,
+          "1996": 0.041196,
+          "1997": 0.040935,
+          "1998": 0.040993,
+          "1999": 0.041098,
+          "2000": 0.040878,
+          "2001": 0.040669,
+          "2002": 0.0408,
+          "2003": 0.041074,
+          "2004": 0.041275,
+          "2005": 0.041319,
+          "2006": 0.041115,
+          "2007": 0.040897,
+          "2008": 0.040665,
+          "2009": 0.040359,
+          "2010": 0.039837,
+          "2011": 0.039217,
+          "2012": 0.038651,
+          "2013": 0.038076,
+          "2014": 0.037548,
+          "2015": 0.037719,
+          "2016": 0.037775,
+          "2017": 0.037516,
+          "2018": 0.036899,
+          "2019": 0.036183,
+          "2020": 0.035438,
+          "2021": 0.034778,
+          "2022": 0.034268,
+          "2023": 0.033743
+        }
+      },
+      "natural_death_rate": {
+        "unit": "per_person_per_year",
+        "source": "World Bank World Development Indicators, Cameroon crude death rate 1960-2023",
+        "note": "Converted from crude death rate per 1000 people to per person per year by dividing by 1000.",
+        "series": {
+          "1990": 0.01501,
+          "1991": 0.015007,
+          "1992": 0.015057,
+          "1993": 0.015197,
+          "1994": 0.015441,
+          "1995": 0.015806,
+          "1996": 0.016298,
+          "1997": 0.016834,
+          "1998": 0.017298,
+          "1999": 0.017617,
+          "2000": 0.017738,
+          "2001": 0.017693,
+          "2002": 0.017574,
+          "2003": 0.01749,
+          "2004": 0.017493,
+          "2005": 0.017586,
+          "2006": 0.017725,
+          "2007": 0.017808,
+          "2008": 0.017778,
+          "2009": 0.017614,
+          "2010": 0.017347,
+          "2011": 0.017038,
+          "2012": 0.016752,
+          "2013": 0.016525,
+          "2014": 0.016353,
+          "2015": 0.016195,
+          "2016": 0.015995,
+          "2017": 0.015736,
+          "2018": 0.015437,
+          "2019": 0.015123,
+          "2020": 0.014823,
+          "2021": 0.014562,
+          "2022": 0.014355,
+          "2023": 0.014206
+        }
+      },
+      "life_expectancy": {
+        "unit": "years",
+        "source": "World Bank World Development Indicators, Cameroon life expectancy at birth 1960-2023",
+        "series": {
+          "1990": 54.464,
+          "2000": 51.696,
+          "2010": 57.031,
+          "2020": 60.315,
+          "2023": 63.7
+        }
+      }
+    },
+    "transmission": {
+      "base_transmission_rate": 0.0025,
+      "base_transmission_rate_note": "PHASE 3: Using 0.0025 (worked in Phase 1 iter 6 with smaller pop)",
+      "initial_hiv_prevalence": 0.0002,
+      "initial_hiv_prevalence_note": "TIME-VARYING v6: Balance - 0.02% (10 agents) avoids extinction but allows growth to 0.5% by 1990",
+      "acute_multiplier": 8.0,
+      "chronic_multiplier": 1.0,
+      "aids_multiplier": 3.0,
+      "use_time_varying_transmission": true,
+      "use_time_varying_transmission_note": "Enable time-varying transmission rates to match epidemic phases",
+      "emergence_phase_multiplier": 0.8,
+      "emergence_phase_multiplier_note": "1985-1990: SLOW emergence - use 0.8x to grow from 0.02% to ~0.5% by 1990",
+      "emergence_phase_end": 1990,
+      "growth_phase_multiplier": 6.0,
+      "growth_phase_multiplier_note": "1990-2007: EXPLOSIVE growth (0.5% \u2192 5.2%) - very high transmission pre-ART era",
+      "growth_phase_end": 2007,
+      "decline_phase_multiplier": 4.0,
+      "decline_phase_multiplier_note": "2007+: VERY HIGH baseline (4.0x) to counteract strong ART suppression - maintains elevated prevalence ~2-3% range"
+    },
+    "disease_progression": {
+      "acute_duration_months": 3.0,
+      "chronic_duration_years": 9.0,
+      "aids_duration_years": 2.0
+    },
+    "social_behavioral": {
+      "mean_contacts_per_year": 4.1219,
+      "mean_contacts_per_year_note": "CALIBRATED: Original 2.5 * contact_rate_multiplier 1.649 = 4.12",
+      "contact_variance": 1.4,
+      "risk_group_proportions": {
+        "low": 0.85,
+        "medium": 0.14,
+        "high": 0.01
+      },
+      "risk_group_multipliers": {
+        "low": 0.7,
+        "medium": 1.6,
+        "high": 52.2351,
+        "high_note": "CALIBRATED: Original 15.0 enhanced by risk_group_multiplier 3.482 = 52.24 (relative transmission boost for high-risk group)"
+      }
+    },
+    "interventions": {
+      "art_start_year": 2002,
+      "art_efficacy_transmission": 0.92,
+      "art_efficacy_progression": 0.85,
+      "art_mortality_reduction": 0.8,
+      "testing_rate_early": 0.06,
+      "testing_rate_late": 0.28,
+      "treatment_initiation_prob": 0.78,
+      "treatment_adherence": 0.86
+    },
+    "mortality": {
+      "hiv_mortality_multiplier": {
+        "acute": 1.2,
+        "chronic": 1.5,
+        "aids": 8.0
+      }
+    },
+    "scenario": {
+      "funding_cut_scenario": false,
+      "funding_cut_year": 2025,
+      "art_scale_up": {
+        "2002": 0.01,
+        "2005": 0.08,
+        "2010": 0.32,
+        "2015": 0.54,
+        "2020": 0.73,
+        "2023": 0.81
+      }
+    }
+  },
+  "validation_targets": {
+    "source": "UNAIDS Cameroon data",
+    "indicators": [
+      "hiv_prevalence_15_49",
+      "new_hiv_infections",
+      "hiv_deaths",
+      "people_living_with_hiv",
+      "art_coverage",
+      "population_total"
+    ],
+    "acceptance_criteria": {
+      "r_squared": "\u2265 0.85",
+      "relative_bias": "\u2264 \u00b115%",
+      "nse": "\u2265 0.70"
+    }
+  },
+  "base_transmission_rate": 0.0028,
+  "initial_hiv_prevalence": 0.0002,
+  "initial_population": 5000,
+  "mean_contacts_per_year": 2.5,
+  "emergence_phase_multiplier": 0.8,
+  "growth_phase_multiplier": 6.0,
+  "decline_phase_multiplier": 4.0
+}

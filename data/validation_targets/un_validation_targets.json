@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "source": "UN Population Data Portal",
+    "location": "Cameroon",
+    "location_code": 120,
+    "calibration_period": "1990-2015",
+    "validation_period": "2016-2023",
+    "extracted_date": "2025-10-25"
+  },
+  "calibration_targets": {},
+  "validation_targets": {},
+  "acceptance_criteria": {
+    "r_squared": {
+      "threshold": 0.85,
+      "description": "Coefficient of determination"
+    },
+    "relative_error": {
+      "threshold": 0.15,
+      "description": "Maximum acceptable relative error"
+    },
+    "nash_sutcliffe": {
+      "threshold": 0.7,
+      "description": "Nash-Sutcliffe efficiency"
+    },
+    "coverage_probability": {
+      "threshold": 0.9,
+      "description": "90% prediction interval coverage"
+    }
+  }
+}
