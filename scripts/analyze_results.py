@@ -6,11 +6,6 @@ Comprehensive analysis of simulation results:
   - Enhanced results processing
   - Scenario comparison
   - CSV regeneration and extraction
-  
-Consolidates: analyze_detection_gaps.py, analyze_enhanced_results.py,
-analyze_saint_seya_results.py, compare_scenarios.py,
-regenerate_detailed_csv.py, extract_detailed_results.py
-"""
 
 import argparse
 import os
