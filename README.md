@@ -105,15 +105,6 @@ Nine pre-configured scenarios for analysis:
 
 - **[DOCUMENTATION.md](DOCUMENTATION.md)** - Complete user guide
 - **[QUICK_START.md](QUICK_START.md)** - Fast setup and basic usage
-- **docs/** - Technical documentation by topic
-  - `01_calibration/` - Model calibration
-  - `02_validation/` - Validation methods
-  - `03_data_collection/` - Data capture
-  - `04_scenarios/` - Scenario definitions
-  - `05_integration/` - Data integration
-  - `06_time_varying/` - Time-varying parameters
-  - `09_technical/` - Technical details
-  - `10_analysis/` - Analysis methods
 
 ## Citation
 
