@@ -7,10 +7,6 @@ Generate comprehensive plots and visualizations:
   - Scenario comparison plots
   - Validation charts
   - Publication-ready figures
-  
-Consolidates: plot_results.py, plot_prevalence_validation.py,
-visualize_saint_seya.py, generate_publication_plots.py, generate_validation_plots.py
-"""
 
 import argparse
 import os
