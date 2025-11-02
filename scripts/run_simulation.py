@@ -6,8 +6,6 @@ Comprehensive simulation execution with multiple modes:
   2. All policy scenarios execution
   3. Monte Carlo uncertainty analysis
   
-Consolidates: run_simulation.py, run_all_scenarios.py, run_enhanced_montecarlo.py, run_study_pipeline.py
-"""
 
 import argparse
 import os
