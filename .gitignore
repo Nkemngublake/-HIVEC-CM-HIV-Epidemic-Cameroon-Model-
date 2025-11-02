@@ -488,13 +488,23 @@ execution_log_*.txt
 # Archived scripts (consolidated into 5 main scripts)
 scripts/_archived/
 
-# Temporary shell scripts and logs
+# Temporary shell scripts and logs in root
 run_remaining_scenarios.sh
+run_all_scenarios.sh
 run_all_scenarios.sh.bak
 run_saint_seya_simulation.sh
 check_saint_seya_status.sh
 rebuild_docker_ui.sh
+*.sh  # Exclude all root-level shell scripts except those explicitly allowed
+!docker/**/*.sh
+!scripts/**/*.sh
+
+# Simulation logs in root (these are temporary execution logs)
 saint_seya_detailed_simulation.log
+saint_seya_simulation.log
+simulation_1985_2100.log
+docker_build.log
+montecarlo_remaining.log
 extract_detailed_log.txt
 
 # Docker build artifacts
