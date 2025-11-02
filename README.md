@@ -2,200 +2,144 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Status: Active](https://img.shields.io/badge/Status-Active%20Development-green.svg)](https://github.com/Nkemngublake/-HIVEC-CM-HIV-Epidemic-Cameroon-Model-/issues)
 
 ## Overview
 
-**HIVEC-CM** (HIV Epidemic Cameroon Model) is a sophisticated agent-based mathematical model, developed by Nkemngu Blake, for simulating HIV/AIDS epidemic dynamics in Cameroon from 1990-2100. The model incorporates evidence-based parameters, time-varying interventions, and policy scenarios to support public health decision-making and research.
+HIVEC-CM is an agent-based mathematical model simulating HIV/AIDS epidemic dynamics in Cameroon (1985-2100). The model supports public health policy analysis through detailed demographic tracking, disease progression modeling, and intervention impact assessment.
 
-## ✨ Key Features
+**Author**: Nkemngu Blake Afutendem  
+**Institution**: University of Buea, Cameroon  
+**Version**: 4.0 (November 2025)
 
-- **Agent-Based Modeling**: Individual-level tracking with detailed demographic and health status modeling
-- **Disease Progression**: Comprehensive HIV disease stages (acute, chronic, AIDS) with realistic transition rates
-- **Intervention Modeling**: ART scale-up, prevention programs, male circumcision, and testing strategies
-- **Advanced Calibration**: Automated parameter optimization using differential evolution and Nelder-Mead algorithms
-- **Comprehensive Analysis**: Epidemiological indicators, transmission dynamics, and intervention impact assessment
-- **Data Integration**: Real-world calibration using World Bank population data and UNAIDS HIV statistics
-- **Professional Visualization**: Multi-panel dashboards with publication-quality figures
+## Key Features
 
-## 🚀 Quick Start
+- Agent-based modeling with individual-level tracking
+- HIV disease progression through acute, chronic, and AIDS stages
+- Treatment and prevention interventions (ART, male circumcision, testing)
+- Calibrated against World Bank and UNAIDS data (1990-2022)
+- Regional analysis (12 Cameroon regions)
+- Age-sex stratification (10 age groups × 2 sexes)
+- Policy scenario analysis (9 pre-configured scenarios)
+- Web-based visualization interface
 
-### Prerequisites
-
-- Python 3.8 or higher
-- Virtual environment (recommended)
+## Quick Start
 
 ### Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository_url>
-   cd HIV_AIDS_Cameroon_Analysis
-   ```
+```bash
+# Clone repository
+git clone https://github.com/Nkemngublake/-HIVEC-CM-HIV-Epidemic-Cameroon-Model-.git
+cd -HIVEC-CM-HIV-Epidemic-Cameroon-Model-
 
-2. **Create and activate virtual environment**:
-   ```bash
-   python -m venv hiv_model_env
-   source hiv_model_env/bin/activate  # On Windows: hiv_model_env\Scripts\activate
-   ```
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Install dependencies
+pip install -r requirements.txt
+```
 
-### Basic Usage
+### Run a Simulation
 
-1. **Run a simple simulation**:
-   ```bash
-   python -m src.main --years 20 --output results --config config/parameters.json
-   ```
+```bash
+# Single scenario
+./scripts/run_simulation.py --mode single --scenario S0_baseline --population 25000
 
-2. **Run with calibration**:
-   ```bash
-   python -m src.main --calibrate --years 30 --output calibrated_results --config config/parameters.json
-   ```
+# All policy scenarios
+./scripts/run_simulation.py --mode scenarios --population 50000 --output results/analysis
 
-3. **Use custom parameters (JSON)**:
-   ```bash
-   python -m src.main --config config/parameters.json --output custom_results
-   ```
+# Monte Carlo analysis
+./scripts/run_simulation.py --mode montecarlo --runs 100 --population 10000
+```
 
-4. **Validate input data**:
-   ```bash
-   python -m src.main --validate-data --years 25 --config config/parameters.json
-   ```
+### Web Interface
 
-## 📊 Model Architecture
+```bash
+# Local
+streamlit run ui/app.py
+
+# Docker
+docker-compose -f docker/docker-compose.yml up
+# Access at http://localhost:8501
+```
+
+## Model Structure
 
 ### Core Components
 
-- **`src/models/hiv_model.py`**: Enhanced agent-based HIV epidemic model with individual tracking
-- **`src/models/calibrator.py`**: Advanced parameter estimation and model calibration
-- **`src/analysis/analyzer.py`**: Comprehensive analysis framework with visualization
-- **`src/utils/`**: Data loading, configuration management, and utilities
-
-### Key Model Features
-
-- **Individual Agents**: Each person tracked with age, gender, HIV status, treatment history
-- **Disease Progression**: Acute → Chronic → AIDS progression with realistic rates
-- **Treatment Modeling**: ART initiation, adherence, failure, and efficacy
-- **Demographics**: Birth, death, aging, and population dynamics
-- **Interventions**: Prevention programs, testing campaigns, treatment scale-up
-
-## 🎯 Use Cases
-
-### Research Applications
-
-- **Epidemic Forecasting**: Project future HIV prevalence and incidence
-- **Intervention Planning**: Evaluate impact of different prevention and treatment strategies
-- **Policy Analysis**: Assess cost-effectiveness of public health interventions
-- **Academic Research**: Publication-ready epidemiological modeling and analysis
-
-### Example Analyses
-
-1. **Baseline Epidemiology**: Understand historical HIV trends in Cameroon
-2. **ART Impact**: Quantify the effect of treatment scale-up on epidemic dynamics
-3. **Prevention Strategies**: Model male circumcision, PrEP, and behavioral interventions
-4. **Future Scenarios**: Project epidemic trajectories under different policy scenarios
-
-## 📈 Output and Results
-
-### Generated Files
-
-- **`simulation_results.csv`**: Complete time-series data from the simulation
-- **`analysis_dashboard.png`**: Multi-panel visualization of key indicators
-- **`analysis_summary.txt`**: Text summary of epidemic indicators
-- **`run_metadata.json`**: Complete run configuration and metadata
-
-### Key Metrics
-
-- HIV prevalence and incidence over time
-- ART coverage and treatment outcomes
-- Population dynamics and demographic trends
-- Intervention impact assessments
-- Validation metrics against real data
-
-## ⚙️ Configuration
-
-### Configuration File Format (YAML)
-
-```yaml
-# Simulation parameters
-simulation:
-  years: 35
-  dt: 0.1
-  output_frequency: 10
-
-# Model parameters
-model:
-  initial_population: 75000
-  initial_hiv_prevalence: 0.054
-  transmission_rate: 0.12
-  art_efficacy: 0.95
-
-# Calibration settings
-calibration:
-  method: differential_evolution
-  max_iterations: 100
-  parameters_to_calibrate:
-    - transmission_rate
-    - death_rate_hiv
-    - art_efficacy
-
-# Interventions
-interventions:
-  art_scale_up:
-    enabled: true
-    start_year: 2005
-    target_coverage: 0.81
+```
+src/hivec_cm/
+├── models/          # HIV model and parameter handling
+├── scenarios/       # Policy scenario definitions
+├── core/            # Disease and demographic parameters
+└── calibration/     # Parameter optimization
 ```
 
-### Command Line Options
+### Scripts
 
-```bash
-python -m src.main [OPTIONS]
+Five command-line tools for different tasks:
 
-Options:
-  --years YEARS                 Simulation duration (default: 35)
-  --population POPULATION       Initial population size (default: 75000)
-  --calibrate                   Run calibration before simulation
-  --output OUTPUT              Output directory (default: results)
-  --config CONFIG              Parameter file (JSON; default: config/parameters.json)
-  --data-file DATA_FILE        Custom data file for calibration
-  --validate-data              Validate input data before running
-  --log-level LEVEL            Logging level (DEBUG, INFO, WARNING, ERROR)
+1. **run_simulation.py** - Execute simulations (single, scenarios, montecarlo)
+2. **analyze_results.py** - Analyze outputs (comprehensive, gaps, compare)
+3. **generate_plots.py** - Create visualizations (age-sex, regional, cascade)
+4. **monitor.py** - Live monitoring (progress tracking, status)
+5. **validation.py** - Model validation (parameters, milestones, benchmarks)
+
+## Policy Scenarios
+
+Nine pre-configured scenarios for analysis:
+
+| ID | Scenario | Description |
+|----|----------|-------------|
+| S0 | Baseline | Status quo continuation |
+| S1a | Optimistic Funding | Sustained investment |
+| S1b | Pessimistic Funding | 40% budget reduction |
+| S2a | Intensified Testing | Expanded testing campaigns |
+| S2b | Key Populations | Focus on high-risk groups |
+| S2c | 95-95-95 Achievement | UNAIDS cascade targets |
+| S2d | Youth Focus | Adolescent interventions |
+| S3a | PSN Aspirational | National plan targets |
+| S3b | Geographic Priority | Regional focus |
+
+## Documentation
+
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Complete user guide
+- **[QUICK_START.md](QUICK_START.md)** - Fast setup and basic usage
+- **docs/** - Technical documentation by topic
+  - `01_calibration/` - Model calibration
+  - `02_validation/` - Validation methods
+  - `03_data_collection/` - Data capture
+  - `04_scenarios/` - Scenario definitions
+  - `05_integration/` - Data integration
+  - `06_time_varying/` - Time-varying parameters
+  - `09_technical/` - Technical details
+  - `10_analysis/` - Analysis methods
+
+## Citation
+
+```bibtex
+@software{nkemngu2025hiveccm,
+  author = {Nkemngu Blake Afutendem},
+  title = {HIVEC-CM: Agent-Based Model for HIV/AIDS Epidemic Dynamics in Cameroon},
+  year = {2025},
+  publisher = {GitHub},
+  url = {https://github.com/Nkemngublake/-HIVEC-CM-HIV-Epidemic-Cameroon-Model-}
+}
 ```
 
-## 📋 Data Sources
+## License
 
-- **World Bank**: Population statistics and HIV prevalence data for Cameroon
-- **UNAIDS**: Treatment coverage, program effectiveness data
-- **Integrated Dataset**: `data/cameroon_hiv_population_data.csv` with 1990-2022 data
+MIT License - See [LICENSE](LICENSE) file for details
 
-## 🔬 Model Validation
+## Contact
 
-The model is validated against historical data using multiple metrics:
+**Nkemngu Blake Afutendem**  
+University of Buea, Cameroon  
+GitHub: [@Nkemngublake](https://github.com/Nkemngublake)
 
-- **Mean Absolute Error (MAE)**: Average deviation from observed prevalence
-- **R-squared**: Proportion of variance explained by the model
-- **Correlation**: Linear relationship between simulated and observed data
-- **Trend Analysis**: Comparison of epidemic trajectories
+---
 
-## 🛠️ Development
-
-### Project Structure
-
-```
-HIV_AIDS_Cameroon_Analysis/
-├── src/                          # Source code
-│   ├── models/                   # Core epidemiological models
-│   ├── analysis/                 # Analysis and visualization
-│   └── utils/                    # Utilities and helpers
-├── config/                       # Configuration files
-├── data/                         # Input datasets
-├── tests/                        # Unit tests
-├── notebooks/                    # Jupyter notebooks
+**Data Sources**: World Bank Open Data, UNAIDS, Cameroon CAMPHIA Survey (2017-2018)
 ├── results/                      # Output directory
 ├── docs/                         # Documentation
 ├── src/main.py                   # Main execution script
@@ -253,108 +197,3 @@ You can run an interactive local UI to watch the simulation evolve.
   - Included: `ui/dash_app.py`
   - Run: `python ui/dash_app.py`
   - Mechanism: background thread + queue; `dcc.Interval` polls updates every 300ms.
-
-- FastAPI + WebSockets + React/D3 (advanced):
-  - Backend included: `ui_server/main.py`
-  - Run API: `uvicorn ui_server.main:app --reload`
-  - Start a run: `POST /api/simulations` (see `ui_server/schemas.py`)
-  - Receive updates: connect `ws://localhost:8000/ws/simulations/{id}`
-  - Frontend: bring your own (React/Typescript + D3 recommended). The model already streams one JSON per simulated year.
-
-## 📄 Manuscripts (LaTeX)
-
-- Generate LaTeX macros from a study (figure paths, labels, config):
-  - `python scripts/generate_latex_labels.py --study-dir results/montecarlo_study/study_YYYYMMDD_HHMMSS --out-dir manuscripts`
-  - This writes: `manuscripts/study_config.tex`, `labels.tex`, `fig_paths.tex`.
-
-- Build ready-made skeletons for four papers (requires `pdflatex`):
-  - Makefile targets (auto-detects latest study):
-    - `make labels` — generate macros
-    - `make methods` — compile Methods paper
-    - `make calibration` — compile Calibration/Validation paper
-    - `make uncertainty` — compile Uncertainty paper
-    - `make fundingcut` — compile Funding-cut Policy paper
-    - `make all` — build all of the above
-  - Override the study directory: `make all STUDY_DIR=results/montecarlo_study/study_YYYYMMDD_HHMMSS`
-
-- Optional artifacts:
-  - Milestones: `make milestones INCIDENCE_THRESHOLD=1.0 INCIDENCE_SCALE=per1000 PREVALENCE_THRESHOLD=2.0 ART_THRESHOLD=90`
-  - Compact PDF report: `make report`
-
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📚 Technical Documentation
-
-### Mathematical Model
-
-The model implements a compartmental SEIR-like structure with the following states:
-- **Susceptible**: Individuals at risk of HIV infection
-- **Acute HIV**: Recently infected individuals (high viral load)
-- **Chronic HIV**: Stable infection phase
-- **AIDS**: Advanced HIV disease
-- **On ART**: Individuals receiving antiretroviral treatment
-
-### Calibration Methods
-
-- **Differential Evolution**: Global optimization algorithm for parameter estimation
-- **Nelder-Mead**: Local optimization for fine-tuning parameters
-- **Multi-objective**: Simultaneous optimization of multiple epidemiological indicators
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact
-
-For questions, issues, or collaborations:
-
-Nkemngu Blake A. (nkemngublake@gmail.com)
-- Open an issue on GitHub
-- Contact the development team
-- Review the documentation in the `docs/` directory
-
-## 🙏 Acknowledgments
-
-- **World Bank** for providing comprehensive demographic and health data
-- **UNAIDS** for HIV/AIDS statistics and program data
-- **Research Community** for epidemiological modeling best practices
-
----
-
-*This model is designed for research and educational purposes. Results should be interpreted by qualified epidemiologists and public health professionals.*
-
-## Data Sources
-- **World Bank**: Population data and HIV prevalence rates for Cameroon
-- **UNAIDS**: Additional HIV/AIDS statistics and estimates
-
-## Key Datasets
-1. `cameroon_hiv_population_data.csv` - Merged population and HIV prevalence data
-2. `estimated_people_living_with_hiv.csv` - UNAIDS estimates
-3. `people_on_art.csv` - Antiretroviral therapy coverage data
-
-## Installation & Setup
-```bash
-# Clone repository
-git clone <repository-url>
-cd HIV_AIDS_Cameroon_Analysis
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run analysis
-python scripts/data_processing.py
-python scripts/data_wrangling.py
-python scripts/time_series_analysis.py
-```
-
-## Usage
-1. **Data Download**: Run `data_processing.py` to fetch latest data
-2. **Data Preparation**: Run `data_wrangling.py` to clean and merge datasets
-3. **Analysis**: Run analysis scripts or use Jupyter notebooks for exploration
